@@ -46,6 +46,7 @@ export const loginAdmin = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Admin login error:", error);
     return res.status(500).json({
       success: false,
       message: "Login failed",

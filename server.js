@@ -32,11 +32,15 @@ if (!fs.existsSync(uploadsDir)) {
 // CORS — allow your Vercel frontend domain (set FRONTEND_URL in .env)
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:5000",
   "http://localhost:5500",
   "http://127.0.0.1:5500",
   "http://127.0.0.1:3000",
 ];
-if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
+if (process.env.FRONTEND_URL) {
+  // Support comma-separated list of origins
+  process.env.FRONTEND_URL.split(',').forEach(url => allowedOrigins.push(url.trim()));
+}
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -64,6 +68,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/footer", footerRoutes);
+
+// Global error handler — return JSON instead of HTML stack traces
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ success: false, message: "Internal server error" });
+});
 
 const PORT = process.env.PORT || 5000;
 
